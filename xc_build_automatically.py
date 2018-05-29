@@ -25,8 +25,8 @@ SDK = "iphoneos"
 # configuration for pgyer
 PGYER_UPLOAD_URL = "https://www.pgyer.com/apiv2/app/upload"
 DOWNLOAD_BASE_URL = "http://www.pgyer.com"
-USER_KEY = 'xxxxxx' # replace with your pgyer userkey
-API_KEY = 'xxxxxx' # replace with your pgyer apikey
+USER_KEY = "df00dc35666d7196c62e029085443fe4"
+API_KEY = "d6e74aee5656dd9fc8590a401908b247"
 
 def cleanBuildDir(dir):
     if os.path.exists(dir):
@@ -77,7 +77,7 @@ def buildProject(project, target, output, manual=False):
     if output is None:
         outputPath = os.path.expanduser('~/Desktop/XcodeAPP/IPA_ONLY')
         if not os.path.exists(outputPath):
-            os.mkdir(outputPath)
+            os.makedirs(outputPath)
         timestamp = int(time.time())
         output = '%s/%s_%d.ipa' % (outputPath, target, timestamp)
 
@@ -110,7 +110,7 @@ def buildWorkspace(workspace, scheme, output, manual=False):
     if output is None:
         outputPath = os.path.expanduser('~/Desktop/XcodeAPP/IPA_ONLY')
         if not os.path.exists(outputPath):
-            os.mkdir(outputPath)
+            os.makedirs(outputPath)
         timestamp = int(time.time())
         output = '%s/%s_%d.ipa' % (outputPath, scheme, timestamp)
 
