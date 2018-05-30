@@ -13,8 +13,8 @@ CONFIGURATION = 'Debug'
 # configuration for pgyer
 PGYER_UPLOAD_URL = 'https://www.pgyer.com/apiv2/app/upload'
 DOWNLOAD_BASE_URL = 'https://www.pgyer.com'
-USER_KEY = 'df00dc35666d7196c62e029085443fe4'
-API_KEY = 'd6e74aee5656dd9fc8590a401908b247'
+USER_KEY = "xxxxxx" #replace with your pgyer userkey
+API_KEY = "xxxxxx" #replace with your pgyer apikey
 
 def cleanBuildDir(buildDir):
 	cleanCmd = 'rm -r %s' % (buildDir)
