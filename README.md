@@ -13,7 +13,7 @@
 ```Bash
 python3 --version
 ```
-显示 `Python 3.x.x` 即Python3环境已安装
+显示 `Python 3.x.x` 即 `Python3` 环境已配置
 
 如果未安装`Python3` 推荐使用 [Homebrew](https://brew.sh/) 安装
 
@@ -39,7 +39,7 @@ pip3 install requests
 
 ****** 即将完成 ******
 
-到这里基本上就大功告成了, 然鹅还差一小步. 请继续看下面
+到这里基本上就大功告成了, 然鹅还差一小步. 请继续往下看
 
 * 对`Xcode`的配置
 
@@ -87,6 +87,6 @@ python3 xc_archive_automatically.py -p yourproj.xcodeproj -n yourproj -c Debug
 -o 导出路径 默认为桌面 XcodeAPP 目录<br>
 -m 只导出ipa不上传<br>
 
-
+到这里就结束了, 试一试吧.
 
 
