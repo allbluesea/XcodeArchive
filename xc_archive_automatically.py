@@ -13,14 +13,13 @@ CONFIGURATION = 'Debug'
 # configuration for pgyer
 PGYER_UPLOAD_URL = 'https://www.pgyer.com/apiv2/app/upload'
 DOWNLOAD_BASE_URL = 'https://www.pgyer.com'
-USER_KEY = "xxxxxx" #replace with your pgyer userkey
-API_KEY = "xxxxxx" #replace with your pgyer apikey
+API_KEY = 'xxxxxx' #replace with your pgyer apikey
 
 def cleanBuildDir(buildDir):
 	cleanCmd = 'rm -r %s' % (buildDir)
 	process = subprocess.Popen(cleanCmd, shell=True)
 	process.wait()
-	print('clean build dir: %s' % buildDir)
+
 
 def parseUploadResult(jsonResult):
 	resultCode = jsonResult['code']
@@ -28,7 +27,7 @@ def parseUploadResult(jsonResult):
 		url = DOWNLOAD_BASE_URL + '/' + jsonResult['data']['buildShortcutUrl']
 		print('%s\nDownload Url : %s\n' % (attrtext('\n** UPLOAD SUCCEEDED **\n', mode='bold'), url))
 	else:
-		print('Upload Failed!\nReason: ', jsonResult['message'])
+		print('%s\tReason: %s\n' % (attrtext('\nUpload Failed!', mode='bold', foreground_color='red'), jsonResult['message']))
 
 def uploadIpaToPgyer(ipaPath):
 # 	_api_key	String	(必填) API Key 点击获取_api_key
@@ -70,11 +69,11 @@ def buildProject(project, scheme, output=None, manual=False):
 	if not manual:
 		ipaPath = output + '/%s.ipa' % scheme
 		abspath = os.path.expanduser(ipaPath)
-		if os.path.iffile(abspath):
+		if os.path.isfile(abspath):
 			uploadIpaToPgyer(abspath)
 		else:
-			print('err: ipa dose not exists')
-		#cleanBuildDir('./build')
+			print(attrtext('ERROR: IPA NOT FOUND', mode='bold', foreground_color='red'))
+
 
 def buildWorkspace(workspace, scheme, output=None, manual=False):
 	process = subprocess.Popen('pwd', stdout=subprocess.PIPE)
@@ -98,11 +97,11 @@ def buildWorkspace(workspace, scheme, output=None, manual=False):
 	if not manual:
 		ipaPath = output + '/%s.ipa' % scheme
 		abspath = os.path.expanduser(ipaPath)
-		if os.path.iffile(abspath):
+		if os.path.isfile(abspath):
 			uploadIpaToPgyer(abspath)
 		else:
-			print('err: ipa dose not exists')
-	# cleanBuildDir(buildDir)
+			print(attrtext('ERROR: IPA NOT FOUND', mode='bold', foreground_color='red'))
+
 
 def xcbuild(options):
 	project = options.project
@@ -110,9 +109,12 @@ def xcbuild(options):
 	scheme = options.name
 	output = options.output
 	manual = options.manual
+	config = options.config
+
+	CONFIGURATION = config
 
 	if project is None and workspace is None:
-		print('Warning: you must provide the parms project or workspace...')
+		print('warning: you must provide the parms project or workspace...')
 	elif project is not None:
 		buildProject(project, scheme, output, manual)
 	elif workspace is not None:
@@ -125,11 +127,11 @@ def main():
 	parser.add_option('-n', '--name', help='The scheme/target name specified if bulid a workspace/project， required if is workspace.', metavar='scheme/target')
 	parser.add_option('-o', '--output', help='Specify output filePath', metavar='output_filePath')
 	parser.add_option('-m', '--manual', action='store_true', help='Upload to the pyger platform manualy or automatically , default by automatically')
+	parser.add_option('-c', '--config', action='store', default='Debug', help='use the build configuration NAME for building each target, Defaults to Debug')
 
 	(options, args) = parser.parse_args()
 	
 	xcbuild(options)
 
 if __name__ == '__main__':
-	# main()
-	cleanBuildDir('123')
+	main()

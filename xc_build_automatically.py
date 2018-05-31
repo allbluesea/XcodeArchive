@@ -12,21 +12,20 @@ from console_style import attrtext
 
 #configuration for iOS build setting
 
-#CODE_SIGN_IDENTITY = "iPhone Distribution: xxxxxxxx Co. Ltd (xxxxxxx9A)"
-#PROVISIONING_PROFILE = "xxxxxxxxxx-xxxxx-xxxxx-xxxx-xxxxxxxxxxxx"
-#CONFIGURATION = "Release"
-#SDK = "iphoneos"
+#CODE_SIGN_IDENTITY = 'iPhone Distribution: xxxxxxxx Co. Ltd (xxxxxxx9A)'
+#PROVISIONING_PROFILE = 'xxxxxxxxxx-xxxxx-xxxxx-xxxx-xxxxxxxxxxxx'
+#CONFIGURATION = 'Release'
+#SDK = 'iphoneos'
 
-CODE_SIGN_IDENTITY = ""
-PROVISIONING_PROFILE = ""
-CONFIGURATION = "Debug"
-SDK = "iphoneos"
+CODE_SIGN_IDENTITY = ''
+PROVISIONING_PROFILE = ''
+CONFIGURATION = 'Debug'
+SDK = 'iphoneos'
 
 # configuration for pgyer
-PGYER_UPLOAD_URL = "https://www.pgyer.com/apiv2/app/upload"
-DOWNLOAD_BASE_URL = "http://www.pgyer.com"
-USER_KEY = "xxxxxx" #replace with your pgyer userkey
-API_KEY = "xxxxxx" #replace with your pgyer apikey
+PGYER_UPLOAD_URL = 'https://www.pgyer.com/apiv2/app/upload'
+DOWNLOAD_BASE_URL = 'https://www.pgyer.com'
+API_KEY = 'xxxxxx' #replace with your pgyer apikey
 
 def cleanBuildDir(dir):
     if os.path.exists(dir):
@@ -42,7 +41,7 @@ def parseUploadResult(jsonResult):
         url = DOWNLOAD_BASE_URL + '/' + jsonResult['data']['buildShortcutUrl']
         print('%s\nDownload Url : %s\n' % (attrtext('\n** UPLOAD SUCCEEDED **\n', mode='bold'), url))
     else:
-        print('Upload Failed!\nReason: ', jsonResult['message'])
+        print('%s\tReason: %s\n' % (attrtext('\nUpload Failed!', mode='bold', foreground_color='red'), jsonResult['message']))
 
 def uploadIpaToPgyer(ipaPath):
 #   _api_key    String  (必填) API Key 点击获取_api_key
@@ -69,7 +68,7 @@ def buildProject(project, target, output, manual=False):
     if len(CODE_SIGN_IDENTITY) and len(PROVISIONING_PROFILE):
         buildCmd = 'xcodebuild -project %s -target %s -sdk %s -configuration %s build CODE_SIGN_IDENTITY="%s" PROVISIONING_PROFILE="%s" SYMROOT=%s' %(project, target, SDK, CONFIGURATION, CODE_SIGN_IDENTITY, PROVISIONING_PROFILE, buildDir)
     else:
-        buildCmd = 'xcodebuild -project %s -target %s -sdk %s -configuration %s SYMROOT=%s' %(project, target, SDK, CONFIGURATION, buildDir)
+        buildCmd = 'xcodebuild -project %s -target %s -sdk %s -configuration %s SYMROOT=%s' % (project, target, SDK, CONFIGURATION, buildDir)
     
     process = subprocess.Popen(buildCmd, shell = True)
     process.wait()
@@ -79,10 +78,10 @@ def buildProject(project, target, output, manual=False):
         if not os.path.exists(outputPath):
             os.makedirs(outputPath)
         timestamp = int(time.time())
-        output = '%s/%s_%d.ipa' % (outputPath, target, timestamp)
+        output = '%s/%s_%s_%d.ipa' % (outputPath, target, CONFIGURATION.lower(), timestamp)
 
-    signApp = "%s/%s-iphoneos/%s.app" %(buildDir, CONFIGURATION, target)
-    signCmd = "xcrun -sdk %s -v PackageApplication %s -o %s" %(SDK, signApp, output)
+    signApp = '%s/%s-iphoneos/%s.app' %(buildDir, CONFIGURATION, target)
+    signCmd = 'xcrun -sdk %s -v PackageApplication %s -o %s' %(SDK, signApp, output)
     process = subprocess.Popen(signCmd, shell=True)
     (stdoutdata, stderrdata) = process.communicate()
     
@@ -91,7 +90,7 @@ def buildProject(project, target, output, manual=False):
         if os.path.isfile(abspath):
             uploadIpaToPgyer(abspath)
         else:
-            print(attrtext('Err: ipa does not exists', mode='bold', foreground_color='red'))
+            print(attrtext('ERROR: IPA NOT FOUND', mode='bold', foreground_color='red'))
 
     cleanBuildDir(buildDir)
 
@@ -114,8 +113,8 @@ def buildWorkspace(workspace, scheme, output, manual=False):
         timestamp = int(time.time())
         output = '%s/%s_%d.ipa' % (outputPath, scheme, timestamp)
 
-    signApp = "%s/%s-iphoneos/%s.app" % (buildDir, CONFIGURATION, scheme)
-    signCmd = "xcrun -sdk %s -v PackageApplication %s -o %s" % (SDK, signApp, output)
+    signApp = '%s/%s-iphoneos/%s.app' % (buildDir, CONFIGURATION, scheme)
+    signCmd = 'xcrun -sdk %s -v PackageApplication %s -o %s' % (SDK, signApp, output)
     process = subprocess.Popen(signCmd, shell=True)
     (stdoutdata, stderrdata) = process.communicate()
     
@@ -124,7 +123,7 @@ def buildWorkspace(workspace, scheme, output, manual=False):
         if os.path.isfile(abspath):
             uploadIpaToPgyer(abspath)
         else:
-            print(attrtext('Err: ipa does not exists', mode='bold', foreground_color='red'))
+            print(attrtext('ERROR: IPA NOT FOUND', mode='bold', foreground_color='red'))
 
     cleanBuildDir(buildDir)
 
@@ -134,9 +133,12 @@ def xcbuild(options):
     name = options.name
     output = options.output
     manual = options.manual
+    config = options.config
+
+    CONFIGURATION = config
     
     if project is None and workspace is None:
-        print('Warning: you must provide the parms project or workspace...')
+        print('warning: you must provide the parms project or workspace...')
     elif project is not None:
         buildProject(project, name, output, manual)
     elif workspace is not None:
@@ -144,11 +146,12 @@ def xcbuild(options):
 
 def main():
     parser = OptionParser()
-    parser.add_option("-w", "--workspace", help="Build the workspace name.xcworkspace.", metavar="name.xcworkspace")
-    parser.add_option("-p", "--project", help="Build the project name.xcodeproj.", metavar="name.xcodeproj")
-    parser.add_option("-n", "--name", help="The scheme/target name specified if bulid a workspace/project， required if is workspace.", metavar="scheme/target")
-    parser.add_option("-o", "--output", help="specify output filePath+filename", metavar="output_filePath+filename")
+    parser.add_option('-w', '--workspace', help='Build the workspace name.xcworkspace.', metavar='name.xcworkspace')
+    parser.add_option('-p', '--project', help='Build the project name.xcodeproj.', metavar='name.xcodeproj')
+    parser.add_option('-n', '--name', help='The scheme/target name specified if bulid a workspace/project， required if build workspace.', metavar='scheme/target')
+    parser.add_option('-o', '--output', help='specify the output path with filename', metavar='filepath')
     parser.add_option('-m', '--manual', action='store_true', help='Upload to the pyger platform manualy or automatically , default by automatically')
+    parser.add_option('-c', '--config', action='store', default='Debug', help='use the build configuration NAME for building each target, Defaults to Debug')
     
     (options, args) = parser.parse_args()
         
