@@ -2,7 +2,7 @@ For Xcode package automatically
 =====
 
 
-源自网上的一份代码，稍作修改以供使用, 感谢原作者!
+源自网上的一份代码，修改后以供使用, 感谢原作者!
 
 此自动打包脚本运行在 [Python3](https://www.python.org/downloads/) 环境下, 依赖 [requests](https://pypi.org/project/requests/#files) 库
 
